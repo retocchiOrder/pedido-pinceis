@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pedido de Pincéis Retocchi Dinâmico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f9efe9;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header img {
+      max-width: 300px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #004d99;
+    }
+    form {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+    }
+    input[type=text], input[type=email], input[type=number], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .endereco-row {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .endereco-row > div {
+      flex: 1 1 30%;
+      min-width: 150px;
+    }
+    .endereco-row .campo-grande {
+      flex: 1 1 65%;
+    }
+    .grupo-cores {
+      margin-bottom: 25px;
+    }
+    .grupo-cores h3 {
+      border-bottom: 2px solid #004d99;
+      padding-bottom: 6px;
+      margin-bottom: 15px;
+      color: #004d99;
+    }
+    .cor-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .cor-item label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    .bola-cor {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      flex-shrink: 0;
+    }
+    .cor-item input[type=number] {
+      width: 70px;
+      padding: 5px 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center;
+    }
+    #abasGrupos {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #abasGrupos button {
+      padding: 8px 15px;
+      cursor: pointer;
+      border: 1px solid #004d99;
+      background-color: white;
+      color: #004d99;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    #abasGrupos button.active {
+      background-color: #004d99;
+      color: white;
+    }
+    #precoUnitario, #valorTotal {
+      font-weight: 600;
+      color: #007acc;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    #valorTotal {
+      font-size: 20px;
+      margin-top: 5px;
+      color: #007acc;
+    }
+    /* Estilos do Carrinho */
+    #carrinho {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fefefe;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    #carrinho h3 {
+      text-align: center;
+      color: #004d99;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    #carrinho ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #carrinho li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed #eee;
+      font-size: 0.95em;
+    }
+    #carrinho li:last-child {
+      border-bottom: none;
+    }
+    #carrinho .item-nome {
+      flex: 2;
+      font-weight: 600;
+      color: #555;
+    }
+    #carrinho .item-qtd {
+      flex: 1;
+      text-align: center;
+      color: #007acc;
+    }
+    #carrinho .item-subtotal {
+      flex: 1;
+      text-align: right;
+      font-weight: 600;
+      color: #007acc;
+    }
+    #carrinho .carrinho-vazio {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+      padding: 10px;
+    }
+
+    button.enviar {
+      width: 100%;
+      padding: 12px;
+      background-color: #00cc2c;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      margin-top: 20px;
+    }
+    button.enviar:hover {
+      background-color: #058d27;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="OFICIAL_semfundo.png" alt="Logo Retocchi" />
+</header>
+
+<h2>Formulário de Pedido - Pincéis Retocchi</h2>
+
+<form id="pedidoForm">
+
+  <div class="endereco-row">
+    <div>
+      <label for="nomeCliente">Nome Completo:</label>
+      <input type="text" id="nomeCliente" required />
+    </div>
+    <div>
+      <label for="emailCliente">Email:</label>
+      <input type="email" id="emailCliente" required />
+    </div>
+  </div>
+
+  <label for="cpfCliente">CPF ou CNPJ:</label>
+  <input type="text" id="cpfCliente" placeholder="Apenas números, 11 para CPF ou 14 para CNPJ" required />
+
+  <div class="endereco-row">
+    <div>
+      <label for="cepCliente">CEP:</label>
+      <input type="text" id="cepCliente" placeholder="Digite seu CEP" maxlength="9" />
+    </div>
+    <div class="campo-grande">
+      <label for="logradouroCliente">Logradouro:</label>
+      <input type="text" id="logradouroCliente" placeholder="Rua, Avenida..." />
+    </div>
+  </div>
+  <div class="endereco-row">
+    <div>
+      <label for="numeroCliente">Número:</label>
+      <input type="text" id="numeroCliente" placeholder="Número da residência" />
+    </div>
+    <div class="campo-grande">
+      <label for="bairroCliente">Bairro:</label>
+      <input type="text" id="bairroCliente" placeholder="Bairro" />
+    </div>
+  </div>
+
+ <div class="endereco-row">
+  <div>
+    <label for="estadoCliente">Estado:</label>
+    <select id="estadoCliente">
+      <option value="">Selecione o estado</option>
+      <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+      <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+      <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+      <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+      <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+      <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+      <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+      <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+      <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+    </select>
+  </div>
+  <div class="campo-grande">
+    <label for="cidadeCliente">Cidade:</label>
+    <input type="text" id="cidadeCliente" placeholder="Digite sua cidade" />
+  </div>
+  </div>
+  <br/>
+  <br/>
+  <br/>
+  <div id="precoUnitario">Preço unitário por pincel: <strong>R$ 30,00</strong></div>
+  <br/>
+  <br/>
+  <br/>
+  
+  <div id="listaCores">Carregando cores...</div>
+  
+  <div id="valorTotal">Valor total: R$ 0,00</div>
+
+  <div id="carrinho">
+    <h3>Seu Carrinho</h3>
+    <ul id="listaItensCarrinho">
+      <li class="carrinho-vazio">Seu carrinho está vazio.</li>
+    </ul>
+  </div>
+
+  <button type="button" class="enviar" onclick="enviarPedido()">Enviar pedido via WhatsApp</button>
+</form>
+
+<script>
+const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT7glrrSeDKmryNXymih7AOMVlQXsMscSC3NUwUKIH1TRPlWKZvlLQ7iy1TtSzpuaj4TuuLeUgqWKKw/pub?gid=1997528694&single=true&output=csv';
+
+// Variável global para armazenar os dados das cores (útil para futuras expansões)
+let dadosCoresGlobais = [];
+
+async function carregarCores() {
+  const resp = await fetch(csvUrl);
+  const csvText = await resp.text();
+  const linhas = csvText.trim().split('\n');
+
+  dadosCoresGlobais = linhas.slice(1).map(linha => {
+    const colunas = linha.split(',');
+    return {
+      nome: colunas[0].trim(),
+      codigo: colunas[1].trim(),
+      grupo: colunas[2].trim(),
+      cor: colunas[3] ? colunas[3].trim() : '#ccc'
+    };
+  });
+
+  const listaCoresDiv = document.getElementById('listaCores');
+  listaCoresDiv.innerHTML = '';
+  const gruposMap = {};
+
+  dadosCoresGlobais.forEach(cor => {
+    if (!gruposMap[cor.grupo]) gruposMap[cor.grupo] = [];
+    gruposMap[cor.grupo].push(cor);
+  });
+
+  const abasDiv = document.createElement('div');
+  abasDiv.id = 'abasGrupos';
+
+  const conteudosDiv = document.createElement('div');
+  conteudosDiv.id = 'conteudosGrupos';
+
+  Object.keys(gruposMap).forEach((grupo, index) => {
+    const abaBtn = document.createElement('button');
+    abaBtn.textContent = grupo;
+    abaBtn.className = index === 0 ? 'active' : '';
+    // Garante que o botão não submeta o formulário
+    abaBtn.type = 'button';
+    abasDiv.appendChild(abaBtn);
+
+    const grupoDiv = document.createElement('div');
+    grupoDiv.className = 'grupo-cores';
+    grupoDiv.style.display = index === 0 ? 'block' : 'none';
+
+    gruposMap[grupo].forEach(cor => {
+      const divCor = document.createElement('div');
+      divCor.className = 'cor-item';
+
+      const label = document.createElement('label');
+      label.setAttribute('for', cor.codigo);
+
+      const bola = document.createElement('span');
+      bola.className = 'bola-cor';
+      bola.style.backgroundColor = cor.cor;
+
+      const corLower = cor.cor.toLowerCase();
+      if (corLower === '#fff' || corLower === '#ffffff' || corLower === 'white') {
+        bola.style.border = '1px solid #aaa';
+      }
+
+      label.appendChild(bola);
+      label.appendChild(document.createTextNode(` ${cor.nome} – ${cor.codigo}`));
+
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.id = cor.codigo;
+      input.min = '0';
+      input.value = '0';
+      // Adiciona um atributo de dados para armazenar o nome completo do item para o carrinho
+      input.dataset.nomeCompleto = `${cor.nome} – ${cor.codigo}`;
+
+      input.addEventListener('input', atualizarValorTotal);
+
+      divCor.appendChild(label);
+      divCor.appendChild(input);
+      grupoDiv.appendChild(divCor);
+    });
+
+    conteudosDiv.appendChild(grupoDiv);
+
+    abaBtn.addEventListener('click', (event) => {
+      // PREVINE O COMPORTAMENTO PADRÃO DO BOTÃO (como submeter formulário)
+      event.preventDefault();
+
+      abasDiv.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+      abaBtn.classList.add('active');
+
+      conteudosDiv.querySelectorAll('.grupo-cores').forEach(div => div.style.display = 'none');
+
+      grupoDiv.style.display = 'block';
+    });
+  });
+
+  listaCoresDiv.appendChild(abasDiv);
+  listaCoresDiv.appendChild(conteudosDiv);
+
+  // Chama para inicializar o carrinho e o valor total
+  atualizarValorTotal();
+}
+
+carregarCores();
+
+function atualizarValorTotal() {
+  const precoUnitario = 30;
+  const inputs = document.querySelectorAll('#listaCores input[type=number]');
+  let totalPinceis = 0;
+  const itensCarrinho = [];
+
+  inputs.forEach(input => {
+    const qtd = parseInt(input.value);
+    if (!isNaN(qtd) && qtd > 0) {
+      totalPinceis += qtd;
+      const nomeCompleto = input.dataset.nomeCompleto; // Pega o nome completo do atributo de dados
+      const subtotalItem = qtd * precoUnitario;
+      itensCarrinho.push({
+        nome: nomeCompleto,
+        quantidade: qtd,
+        subtotal: subtotalItem
+      });
+    }
+  });
+
+  const valorTotalPedido = totalPinceis * precoUnitario;
+  document.getElementById('valorTotal').textContent = `Valor total: R$ ${valorTotalPedido.toFixed(2).replace('.', ',')}`;
+
+  // --- Lógica para atualizar o carrinho ---
+  const listaItensCarrinho = document.getElementById('listaItensCarrinho');
+  listaItensCarrinho.innerHTML = ''; // Limpa o carrinho existente
+
+  if (itensCarrinho.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'carrinho-vazio';
+    li.textContent = 'Seu carrinho está vazio.';
+    listaItensCarrinho.appendChild(li);
+  } else {
+    itensCarrinho.forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span class="item-nome">${item.nome}</span>
+        <span class="item-qtd">Qtd: ${item.quantidade}</span>
+        <span class="item-subtotal">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+      `;
+      listaItensCarrinho.appendChild(li);
+    });
+  }
+}
+
+async function buscarEndereco(cep) {
+  const cepLimpo = cep.replace(/\D/g, '');
+  if (cepLimpo.length !== 8) return;
+
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+    const data = await res.json();
+
+    if (data.erro) {
+      alert('CEP não encontrado.');
+      return;
+    }
+
+    document.getElementById('logradouroCliente').value = data.logradouro || '';
+    document.getElementById('bairroCliente').value = data.bairro || '';
+    document.getElementById('cidadeCliente').value = data.localidade || '';
+    document.getElementById('estadoCliente').value = data.uf || '';
+  } catch {
+    alert('Erro ao buscar o CEP.');
+  }
+}
+
+document.getElementById('cepCliente').addEventListener('blur', e => {
+  buscarEndereco(e.target.value);
+});
+
+function validarCpfCnpj(valor) {
+  const v = valor.replace(/\D/g, '');
+
+  if (v.length === 11) {
+    return validarCPF(v);
+  } else if (v.length === 14) {
+    return validarCNPJ(v);
+  } else {
+    return false;
+  }
+}
+
+function validarCPF(cpf) {
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+  let soma = 0;
+  for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+
+  let resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.charAt(9))) return false;
+
+  soma = 0;
+  for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.charAt(10))) return false;
+
+  return true;
+}
+
+function validarCNPJ(cnpj) {
+  if (/^(\d)\1{13}$/.test(cnpj)) return false;
+
+  let tamanho = cnpj.length - 2;
+  let numeros = cnpj.substring(0, tamanho);
+  let digitos = cnpj.substring(tamanho);
+  let soma = 0;
+  let pos = tamanho - 7;
+
+  for (let i = tamanho; i >= 1; i--) {
+    soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+    if (pos < 2) pos = 9;
+  }
+
+  let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+  if (resultado !== parseInt(digitos.charAt(0))) return false;
+
+  tamanho = tamanho + 1;
+  numeros = cnpj.substring(0, tamanho);
+  soma = 0;
+  pos = tamanho - 7;
+
+  for (let i = tamanho; i >= 1; i--) {
+    soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+    if (pos < 2) pos = 9;
+  }
+
+  resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+  if (resultado !== parseInt(digitos.charAt(1))) return false;
+
+  return true;
+}
+
+function enviarPedido() {
+  const nome = document.getElementById('nomeCliente').value.trim();
+  const email = document.getElementById('emailCliente').value.trim();
+  const cpfCnpj = document.getElementById('cpfCliente').value.trim();
+  const cep = document.getElementById('cepCliente').value.trim();
+  const logradouro = document.getElementById('logradouroCliente').value.trim();
+  const numero = document.getElementById('numeroCliente').value.trim();
+  const bairro = document.getElementById('bairroCliente').value.trim();
+  const estado = document.getElementById('estadoCliente').value.trim();
+  const cidade = document.getElementById('cidadeCliente').value.trim();
+
+  // Validações antes de enviar o pedido
+  if (!nome || !cpfCnpj) {
+    alert('Nome e CPF/CNPJ são obrigatórios.');
+    return;
+  }
+
+  if (!validarCpfCnpj(cpfCnpj)) {
+    alert('CPF ou CNPJ inválido. Por favor, digite um número válido.');
+    return;
+  }
+
+  if (!logradouro || !numero || !bairro || !estado || !cidade) {
+    alert('Por favor, preencha o endereço completo.');
+    return;
+  }
+
+  const inputs = document.querySelectorAll('#listaCores input[type=number]');
+  let mensagemItens = '';
+  let totalPinceis = 0;
+  const precoUnitario = 30;
+
+  inputs.forEach(input => {
+    const qtd = parseInt(input.value);
+    if (qtd > 0) {
+      const nomeCompleto = input.dataset.nomeCompleto; // Pega o nome completo do atributo de dados
+      mensagemItens += `- ${nomeCompleto}: ${qtd} pincel(es)%0A`;
+      totalPinceis += qtd;
+    }
+  });
+
+  if (totalPinceis === 0) {
+    alert('Por favor, informe a quantidade de pelo menos um pincel.');
+    return;
+  }
+
+  const valorTotalPedido = totalPinceis * precoUnitario;
+
+  let mensagemCompleta = `Olá, quero fazer um pedido:%0A%0A`;
+  mensagemCompleta += `*Dados do Cliente:*%0A`;
+  mensagemCompleta += `Nome: ${nome}%0A`;
+  mensagemCompleta += `Email: ${email}%0A`;
+  mensagemCompleta += `CPF/CNPJ: ${cpfCnpj}%0A`;
+  mensagemCompleta += `CEP: ${cep}%0A`;
+  mensagemCompleta += `Endereço: ${logradouro}, nº ${numero}, Bairro: ${bairro}, Cidade: ${cidade} - ${estado}%0A%0A`;
+  mensagemCompleta += `*Itens do Pedido:*%0A`;
+  mensagemCompleta += mensagemItens;
+  mensagemCompleta += `%0A*Valor Total: R$ ${valorTotalPedido.toFixed(2).replace('.', ',')}*%0A%0A`;
+  mensagemCompleta += `Aguardando confirmação!`;
+
+
+  const numeroWhats = '5551991051353'; // Seu número de WhatsApp com código do país (55) e DDD (51)
+  const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagemCompleta)}`; // Use encodeURIComponent para garantir que a mensagem seja formatada corretamente
+  window.open(url, '_blank');
+}
+</script>
+
+</body>
+</html>
